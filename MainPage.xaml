@@ -1,0 +1,40 @@
+﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Pokedex1.MainPage"
+             Title="Pokedex">
+
+    <VerticalStackLayout Padding="10" Spacing="8">
+        <!-- Search input wired to your code-behind handler -->
+        <SearchBar
+            Placeholder="Search Pokémon"
+            TextChanged="OnSearchTextChanged" />
+
+        <!-- CollectionView must have the x:Name used in code-behind -->
+        <CollectionView
+            x:Name="PokeCollection"
+            SelectionMode="Single"
+            SelectionChanged="OnSelectionChanged"
+            ItemsLayout="VerticalList">
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <!-- Replaced Frame with Border (Frame is obsolete) -->
+                    <Border Padding="8" Margin="4" BackgroundColor="Transparent" StrokeThickness="0">
+                        <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
+                            <!-- If your Pokemon model has an image property, the Image shows it.
+                                 If not, the binding simply won't display anything. -->
+                            <Image
+                                Source="{Binding ImageUrl}"
+                                WidthRequest="48"
+                                HeightRequest="48" />
+                            <Label
+                                Text="{Binding Name}"
+                                VerticalOptions="Center"
+                                FontSize="16" />
+                        </HorizontalStackLayout>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </VerticalStackLayout>
+</ContentPage>

@@ -1,0 +1,30 @@
+﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Pokedex1.DetailPage"
+             Title="Pokémon Details">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15" HorizontalOptions="Center">
+            <Image Source="{Binding ImageUrl}" HeightRequest="200" WidthRequest="200" />
+
+            <Label Text="{Binding Name}" FontSize="32" FontAttributes="Bold" HorizontalOptions="Center" />
+
+            <Border Background="{Binding TypeColor}" Padding="10,5" HorizontalOptions="Center">
+                <Label Text="{Binding Type}" TextColor="White" FontAttributes="Bold" />
+            </Border>
+
+            <Label Text="{Binding Description}" HorizontalTextAlignment="Center" FontSize="16" />
+
+            <VerticalStackLayout Spacing="5" WidthRequest="300">    
+                <Label Text="HP" />
+                <ProgressBar Progress="{Binding HP}" ProgressColor="Green" />
+
+                <Label Text="Attack" />
+                <ProgressBar Progress="{Binding Attack}" ProgressColor="Red" />
+
+                <Label Text="Defense" />
+                <ProgressBar Progress="{Binding Defense}" ProgressColor="Blue" />
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
