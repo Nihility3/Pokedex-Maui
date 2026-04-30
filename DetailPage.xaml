@@ -4,27 +4,193 @@
              Title="Pokémon Details">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="15" HorizontalOptions="Center">
-            <Image Source="{Binding ImageUrl}" HeightRequest="200" WidthRequest="200" />
+        <Grid Padding="16" RowSpacing="12">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
-            <Label Text="{Binding Name}" FontSize="32" FontAttributes="Bold" HorizontalOptions="Center" />
+            <!-- Header card -->
+            <Border Grid.Row="0" StrokeThickness="0" Background="{Binding TypeColor}">
+                <Grid Padding="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
 
-            <Border Background="{Binding TypeColor}" Padding="10,5" HorizontalOptions="Center">
-                <Label Text="{Binding Type}" TextColor="White" FontAttributes="Bold" />
+                    <Image Source="{Binding ImageUrl}" WidthRequest="140" HeightRequest="140" Aspect="AspectFit" />
+
+                    <VerticalStackLayout Grid.Column="1" Padding="10,0" VerticalOptions="Center">
+                        <Label Text="{Binding Name}" FontSize="28" FontAttributes="Bold" TextColor="White" />
+                        <Label Text="{Binding Type}" FontSize="14" TextColor="White" />
+                        <Label Text="{Binding Description}" FontSize="12" TextColor="White" LineBreakMode="WordWrap" MaxLines="4" />
+                    </VerticalStackLayout>
+                </Grid>
             </Border>
 
-            <Label Text="{Binding Description}" HorizontalTextAlignment="Center" FontSize="16" />
+            <Border Grid.Row="1" Padding="10">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Stats" FontAttributes="Bold" />
 
-            <VerticalStackLayout Spacing="5" WidthRequest="300">    
-                <Label Text="HP" />
-                <ProgressBar Progress="{Binding HP}" ProgressColor="Green" />
+                    <!-- Added RowDefinitions and Row assignments -->
+                    <Grid ColumnDefinitions="*,Auto" RowSpacing="10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <!-- HP Labels -->
+                            <RowDefinition Height="Auto" />
+                            <!-- HP Bar -->
+                            <RowDefinition Height="Auto" />
+                            <!-- Attack Labels -->
+                            <RowDefinition Height="Auto" />
+                            <!-- Attack Bar -->
+                            <RowDefinition Height="Auto" />
+                            <!-- ... and so on -->
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
 
-                <Label Text="Attack" />
-                <ProgressBar Progress="{Binding Attack}" ProgressColor="Red" />
+                        <!-- HP Row -->
+                        <Label Text="HP" Grid.Row="0" Grid.Column="0" />
+                        <Label Text="{Binding RawHP}" Grid.Row="0" Grid.Column="1" HorizontalOptions="End" />
+                        <ProgressBar Progress="{Binding HP}" ProgressColor="Green" Grid.Row="1" Grid.ColumnSpan="2" />
 
-                <Label Text="Defense" />
-                <ProgressBar Progress="{Binding Defense}" ProgressColor="Blue" />
-            </VerticalStackLayout>
-        </VerticalStackLayout>
+                        <!-- Attack Row -->
+                        <Label Text="Attack" Grid.Row="2" Grid.Column="0" />
+                        <Label Text="{Binding RawAttack}" Grid.Row="2" Grid.Column="1" HorizontalOptions="End" />
+                        <ProgressBar Progress="{Binding Attack}" ProgressColor="Red" Grid.Row="3" Grid.ColumnSpan="2" />
+
+                        <!-- Defense Row -->
+                        <Label Text="Defense" Grid.Row="4" Grid.Column="0" />
+                        <Label Text="{Binding RawDefense}" Grid.Row="4" Grid.Column="1" HorizontalOptions="End" />
+                        <ProgressBar Progress="{Binding Defense}" ProgressColor="Blue" Grid.Row="5" Grid.ColumnSpan="2" />
+
+                        <!-- Sp. Attack Row -->
+                        <Label Text="Sp. Attack" Grid.Row="6" Grid.Column="0" />
+                        <Label Text="{Binding RawSpecialAttack}" Grid.Row="6" Grid.Column="1" HorizontalOptions="End" />
+                        <ProgressBar Progress="{Binding SpecialAttack}" ProgressColor="Orange" Grid.Row="7" Grid.ColumnSpan="2" />
+
+                        <!-- Sp. Defense Row -->
+                        <Label Text="Sp. Defense" Grid.Row="8" Grid.Column="0" />
+                        <Label Text="{Binding RawSpecialDefense}" Grid.Row="8" Grid.Column="1" HorizontalOptions="End" />
+                        <ProgressBar Progress="{Binding SpecialDefense}" ProgressColor="Purple" Grid.Row="9" Grid.ColumnSpan="2" />
+
+                        <!-- Speed Row -->
+                        <Label Text="Speed" Grid.Row="10" Grid.Column="0" />
+                        <Label Text="{Binding RawSpeed}" Grid.Row="10" Grid.Column="1" HorizontalOptions="End" />
+                        <ProgressBar Progress="{Binding Speed}" ProgressColor="Teal" Grid.Row="11" Grid.ColumnSpan="2" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+            <Border Grid.Row="1" Padding="10">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Stats" FontAttributes="Bold" />
+
+                    <!-- Added RowDefinitions and Row assignments -->
+                    <Grid ColumnDefinitions="*,Auto" RowSpacing="10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <!-- HP Labels -->
+                            <RowDefinition Height="Auto" />
+                            <!-- HP Bar -->
+                            <RowDefinition Height="Auto" />
+                            <!-- Attack Labels -->
+                            <RowDefinition Height="Auto" />
+                            <!-- Attack Bar -->
+                            <RowDefinition Height="Auto" />
+                            <!-- ... and so on -->
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <!-- HP Row -->
+                        <Label Text="HP" Grid.Row="0" Grid.Column="0" />
+                        <Label Text="{Binding RawHP}" Grid.Row="0" Grid.Column="1" HorizontalOptions="End" />
+                        <ProgressBar Progress="{Binding HP}" ProgressColor="Green" Grid.Row="1" Grid.ColumnSpan="2" />
+
+                        <!-- Attack Row -->
+                        <Label Text="Attack" Grid.Row="2" Grid.Column="0" />
+                        <Label Text="{Binding RawAttack}" Grid.Row="2" Grid.Column="1" HorizontalOptions="End" />
+                        <ProgressBar Progress="{Binding Attack}" ProgressColor="Red" Grid.Row="3" Grid.ColumnSpan="2" />
+
+                        <!-- Defense Row -->
+                        <Label Text="Defense" Grid.Row="4" Grid.Column="0" />
+                        <Label Text="{Binding RawDefense}" Grid.Row="4" Grid.Column="1" HorizontalOptions="End" />
+                        <ProgressBar Progress="{Binding Defense}" ProgressColor="Blue" Grid.Row="5" Grid.ColumnSpan="2" />
+
+                        <!-- Sp. Attack Row -->
+                        <Label Text="Sp. Attack" Grid.Row="6" Grid.Column="0" />
+                        <Label Text="{Binding RawSpecialAttack}" Grid.Row="6" Grid.Column="1" HorizontalOptions="End" />
+                        <ProgressBar Progress="{Binding SpecialAttack}" ProgressColor="Orange" Grid.Row="7" Grid.ColumnSpan="2" />
+
+                        <!-- Sp. Defense Row -->
+                        <Label Text="Sp. Defense" Grid.Row="8" Grid.Column="0" />
+                        <Label Text="{Binding RawSpecialDefense}" Grid.Row="8" Grid.Column="1" HorizontalOptions="End" />
+                        <ProgressBar Progress="{Binding SpecialDefense}" ProgressColor="Purple" Grid.Row="9" Grid.ColumnSpan="2" />
+
+                        <!-- Speed Row -->
+                        <Label Text="Speed" Grid.Row="10" Grid.Column="0" />
+                        <Label Text="{Binding RawSpeed}" Grid.Row="10" Grid.Column="1" HorizontalOptions="End" />
+                        <ProgressBar Progress="{Binding Speed}" ProgressColor="Teal" Grid.Row="11" Grid.ColumnSpan="2" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Abilities with descriptions -->
+            <Frame Grid.Row="2" CornerRadius="10" Padding="10">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Abilities" FontAttributes="Bold" />
+                    <CollectionView ItemsSource="{Binding AbilityDetails}" HeightRequest="160">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Frame CornerRadius="8" Padding="8" Margin="0,6" HasShadow="False">
+                                    <VerticalStackLayout>
+                                        <Label Text="{Binding Name}" FontAttributes="Bold" />
+                                        <Label Text="{Binding Description}" FontSize="12" TextColor="Gray" LineBreakMode="WordWrap" />
+                                    </VerticalStackLayout>
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Leveling / how to level up -->
+            <Frame Grid.Row="3" CornerRadius="10" Padding="10">
+                <VerticalStackLayout>
+                    <Label Text="Leveling" FontAttributes="Bold" />
+                    <Label Text="{Binding LevelUpGuide}" FontSize="12" TextColor="Gray" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Evolution chain -->
+            <Frame Grid.Row="4" CornerRadius="10" Padding="10">
+                <VerticalStackLayout>
+                    <Label Text="Evolution Chain" FontAttributes="Bold" />
+                    <CollectionView ItemsSource="{Binding EvolutionChain}" ItemsLayout="HorizontalList" HeightRequest="120">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <VerticalStackLayout Padding="8" Spacing="4" HorizontalOptions="Center">
+                                    <Image Source="{Binding ImageUrl}" WidthRequest="72" HeightRequest="72" />
+                                    <Label Text="{Binding Name}" FontSize="12" HorizontalOptions="Center" />
+                                </VerticalStackLayout>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Frame>
+        </Grid>
     </ScrollView>
 </ContentPage>

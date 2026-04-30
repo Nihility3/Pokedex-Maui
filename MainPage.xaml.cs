@@ -1,27 +1,123 @@
 ﻿using Pokedex1.Models;
 using Pokedex1.Services;
-using System.Linq; // REQUIRED: This fixes the ".Where" error
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Pokedex1;
 
 public partial class MainPage : ContentPage
 {
-    // Class-level field so all methods can see the data
-    List<Pokemon> allPokemon;
+    public ObservableCollection<Pokemon> allPokemon { get; set; } = new ObservableCollection<Pokemon>();
+    private CancellationTokenSource? _cts;
+
+    // paging state
+    private int _offset = 0;
+    private const int PageSize = 30;
+    private bool _isLoadingMore = false;
+    private bool _hasMore = true;
 
     public MainPage()
     {
-        InitializeComponent(); 
-
-        // Initialize the list using the service
-        allPokemon = PokemonService.GetPokemon();
+        InitializeComponent();
         PokeCollection.ItemsSource = allPokemon;
     }
 
-    // Feature: Real-time Search Logic
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+        _ = LoadInitialAsync();
+    }
+
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        _cts?.Cancel();
+    }
+
+    private async Task LoadInitialAsync()
+    {
+        _offset = 0;
+        _hasMore = true;
+        allPokemon.Clear();
+        await LoadMoreAsync(force: true).ConfigureAwait(false);
+    }
+
+
+
+    // Called by RemainingItemsThresholdReached
+    private async void OnRemainingItemsThresholdReached(object sender, EventArgs e)
+    {
+        if (_hasMore)
+        {
+            await LoadMoreAsync();
+        }
+    }
+
+    private async Task LoadMoreAsync(bool force = false)
+    {
+        if (_isLoadingMore || !_hasMore)
+            return;
+
+        _isLoadingMore = true;
+
+        _cts?.Cancel();
+        _cts?.Dispose();
+        _cts = new CancellationTokenSource();
+
+        try
+        {
+            await MainThread.InvokeOnMainThreadAsync(() =>
+            {
+                LoadingIndicator.IsVisible = true;
+                LoadingIndicator.IsRunning = true;
+            });
+
+            var page = await PokemonService.GetPokemonPageAsync(_offset, PageSize, _cts.Token, force).ConfigureAwait(false);
+
+            // Inside your LoadMoreAsync method
+            if (page.Count > 0)
+            {
+                _offset += page.Count;
+
+                await MainThread.InvokeOnMainThreadAsync(() =>
+                {
+                    if (PokeCollection != null)
+                    {
+                        foreach (var pokemon in page)
+                        {
+                            allPokemon.Add(pokemon);
+                        }
+                    }
+                });
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // canceled - ignore
+        }
+        catch (Exception ex)
+        {
+            await MainThread.InvokeOnMainThreadAsync(async () =>
+            {
+                await DisplayAlert("Error", "Failed to load Pokémon: " + ex.Message, "OK");
+            });
+        }
+        finally
+        {
+            _isLoadingMore = false;
+            await MainThread.InvokeOnMainThreadAsync(() =>
+            {
+                LoadingIndicator.IsRunning = false;
+                LoadingIndicator.IsVisible = false;
+            });
+        }
+    }
+
     private void OnSearchTextChanged(object sender, TextChangedEventArgs e)
     {
-        var searchTerm = e.NewTextValue;
+        var searchTerm = e.NewTextValue ?? string.Empty;
 
         if (string.IsNullOrWhiteSpace(searchTerm))
         {
@@ -29,23 +125,71 @@ public partial class MainPage : ContentPage
         }
         else
         {
-            // .ToList() ensures the CollectionView receives a compatible list format
             PokeCollection.ItemsSource = allPokemon
-                .Where(p => p.Name.ToLower().Contains(searchTerm.ToLower()))
+                .Where(p => p.Name?.IndexOf(searchTerm, System.StringComparison.OrdinalIgnoreCase) >= 0)
                 .ToList();
         }
+        ApplyCombinedFilter();
     }
 
-    // Feature: Navigation to Detail
     private async void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (e.CurrentSelection.FirstOrDefault() is Pokemon selected)
         {
-            // Deselect item to allow re-clicking later
             ((CollectionView)sender).SelectedItem = null;
-
-            // Navigate to the DetailPage
             await Navigation.PushAsync(new DetailPage(selected));
         }
+    }
+
+    private void OnTypeFilterChanged(object sender, EventArgs e)
+    {
+        var picker = (Picker)sender;
+        int selectedIndex = picker.SelectedIndex;
+
+        if (selectedIndex == -1) return;
+
+        // Use .Items[selectedIndex] instead of .ItemsSource
+        string selectedType = picker.Items[selectedIndex];
+
+        if (selectedType == "All")
+        {
+            PokeCollection.ItemsSource = allPokemon;
+        }
+        else
+        {
+            // This LINQ filter works perfectly as long as your Pokemon class 
+            // has a 'Type' property[cite: 2]
+            var filteredList = allPokemon
+                .Where(p => p.Type == selectedType)
+                .ToList();
+
+            PokeCollection.ItemsSource = filteredList;
+        }
+        ApplyCombinedFilter();
+    }
+    private void ApplyCombinedFilter()
+    {
+        // 1. Get the current search text (handle nulls and make it lowercase)
+        string searchText = PokemonSearchBar.Text?.ToLower() ?? "";
+
+        // 2. Get the current selected type (handle the "All" case)
+        string selectedType = TypePicker.SelectedIndex != -1
+                              ? TypePicker.Items[TypePicker.SelectedIndex]
+                              : "All";
+
+        // 3. Filter the list based on BOTH conditions
+        var filteredList = allPokemon.Where(p =>
+        {
+            bool matchesSearch = string.IsNullOrWhiteSpace(searchText) ||
+                                 p.Name.ToLower().Contains(searchText);
+
+            bool matchesType = selectedType == "All" ||
+                               p.Type == selectedType;
+
+            return matchesSearch && matchesType;
+        }).ToList();
+
+        // 4. Update the UI
+        PokeCollection.ItemsSource = filteredList;
     }
 }
