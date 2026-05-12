@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Pokedex1.TeamPage"
+             Title="My Pokemon Team">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="10" Spacing="20" BackgroundColor="#2C2C2C">
+
+            <FlexLayout BindableLayout.ItemsSource="{Binding CurrentTeam}" 
+                        Wrap="Wrap" JustifyContent="SpaceEvenly">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate>
+                        <Frame WidthRequest="150" HeightRequest="120" Margin="5" BackgroundColor="#3D3D3D">
+                            <VerticalStackLayout HorizontalOptions="Center">
+                                <Image Source="{Binding ImageUrl}" HeightRequest="60"/>
+                                <Label Text="{Binding Name}" TextColor="White" HorizontalOptions="Center"/>
+                                <Button Text="Remove" Clicked="OnRemoveClicked" CommandParameter="{Binding .}" Scale="0.8"/>
+                            </VerticalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </FlexLayout>
+
+            <Label Text="Team Defense (Weaknesses)" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center"/>
+            <FlexLayout x:Name="DefenseGrid" Wrap="Wrap" JustifyContent="Center">
+            </FlexLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

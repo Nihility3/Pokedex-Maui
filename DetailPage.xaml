@@ -4,6 +4,7 @@
              Title="Pokémon Details">
 
     <ScrollView>
+        
         <Grid Padding="16" RowSpacing="12">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -24,6 +25,13 @@
                     <Image Source="{Binding ImageUrl}" WidthRequest="140" HeightRequest="140" Aspect="AspectFit" />
 
                     <VerticalStackLayout Grid.Column="1" Padding="10,0" VerticalOptions="Center">
+                        <Button Text="Add to Team" 
+                                Clicked="OnAddToTeamClicked" 
+                                BackgroundColor="Crimson" 
+                                TextColor="White" 
+                                CornerRadius="10" 
+                                HorizontalOptions="Center"
+                                Margin="0,20"/>     
                         <Label Text="{Binding Name}" FontSize="28" FontAttributes="Bold" TextColor="White" />
                         <Label Text="{Binding Type}" FontSize="14" TextColor="White" />
                         <Label Text="{Binding Description}" FontSize="12" TextColor="White" LineBreakMode="WordWrap" MaxLines="4" />
@@ -149,23 +157,23 @@
             </Border>
 
             <!-- Abilities with descriptions -->
-            <Frame Grid.Row="2" CornerRadius="10" Padding="10">
+            <Border Grid.Row="2" Padding="10">
                 <VerticalStackLayout Spacing="6">
                     <Label Text="Abilities" FontAttributes="Bold" />
                     <CollectionView ItemsSource="{Binding AbilityDetails}" HeightRequest="160">
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
-                                <Frame CornerRadius="8" Padding="8" Margin="0,6" HasShadow="False">
+                                <Border  Padding="8" Margin="0,6">
                                     <VerticalStackLayout>
                                         <Label Text="{Binding Name}" FontAttributes="Bold" />
                                         <Label Text="{Binding Description}" FontSize="12" TextColor="Gray" LineBreakMode="WordWrap" />
                                     </VerticalStackLayout>
-                                </Frame>
+                                </Border>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
                     </CollectionView>
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
             <!-- Leveling / how to level up -->
             <Frame Grid.Row="3" CornerRadius="10" Padding="10">

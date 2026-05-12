@@ -62,4 +62,18 @@ public partial class DetailPage : ContentPage
             // ignore errors silently
         }
     }
+    private async void OnAddToTeamClicked(object sender, EventArgs e)
+    {
+        var pokemon = (Pokemon)BindingContext;
+
+        if (PokemonService.MyTeam.Count < 6)
+        {
+            PokemonService.MyTeam.Add(pokemon);
+            await DisplayAlert("Success", $"{pokemon.Name} added to team!", "OK");
+        }
+        else
+        {
+            await DisplayAlert("Team Full", "You can only have 6 Pokémon.", "OK");
+        }
+    }
 }

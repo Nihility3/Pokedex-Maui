@@ -2,7 +2,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Pokedex1.MainPage"
              Title="Pokedex">
-
+    
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="View Team" Clicked="OnViewTeamClicked" />
+    </ContentPage.ToolbarItems>
+    
     <!-- Grid gives a fixed area for the SearchBar/Indicator and a stretchable area for the CollectionView -->
     <Grid Padding="10" RowDefinitions="Auto,Auto,*" ColumnDefinitions="*">
         <!-- Search input -->

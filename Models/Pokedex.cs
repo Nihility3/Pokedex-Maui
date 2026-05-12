@@ -57,4 +57,6 @@ public class Pokemon
     public int BaseExperience { get; set; }
     public string GrowthRate { get; set; } = string.Empty;
     public string LevelUpGuide { get; set; } = string.Empty;
+    public List<string> Weaknesses { get; set; } = new();
+    public List<string> Strengths { get; set; } = new();
 }

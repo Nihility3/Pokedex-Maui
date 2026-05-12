@@ -95,7 +95,7 @@ public partial class MainPage : ContentPage
         }
         catch (OperationCanceledException)
         {
-            // canceled - ignore
+
         }
         catch (Exception ex)
         {
@@ -157,8 +157,6 @@ public partial class MainPage : ContentPage
         }
         else
         {
-            // This LINQ filter works perfectly as long as your Pokemon class 
-            // has a 'Type' property[cite: 2]
             var filteredList = allPokemon
                 .Where(p => p.Type == selectedType)
                 .ToList();
@@ -169,15 +167,15 @@ public partial class MainPage : ContentPage
     }
     private void ApplyCombinedFilter()
     {
-        // 1. Get the current search text (handle nulls and make it lowercase)
+        // Get the current search text (handle nulls and make it lowercase)
         string searchText = PokemonSearchBar.Text?.ToLower() ?? "";
 
-        // 2. Get the current selected type (handle the "All" case)
+        // Get the current selected type (handle the "All" case)
         string selectedType = TypePicker.SelectedIndex != -1
                               ? TypePicker.Items[TypePicker.SelectedIndex]
                               : "All";
 
-        // 3. Filter the list based on BOTH conditions
+        // Filter the list based on BOTH conditions
         var filteredList = allPokemon.Where(p =>
         {
             bool matchesSearch = string.IsNullOrWhiteSpace(searchText) ||
@@ -189,7 +187,12 @@ public partial class MainPage : ContentPage
             return matchesSearch && matchesType;
         }).ToList();
 
-        // 4. Update the UI
+        // Update the UI
         PokeCollection.ItemsSource = filteredList;
+    }
+    private async void OnViewTeamClicked(object sender, EventArgs e)
+    {
+        // Pass the global team list to the TeamPage
+        await Navigation.PushAsync(new TeamPage(PokemonService.MyTeam));
     }
 }

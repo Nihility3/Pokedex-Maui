@@ -12,6 +12,8 @@ namespace Pokedex1.Services;
 
 public static class PokemonService
 {
+    public static List<Pokemon> MyTeam { get; set; } = new List<Pokemon>();
+
     private static readonly HttpClient _http = new();
     private static readonly SemaphoreSlim _semaphore = new(8); // concurrency for detail/ability calls
     private static readonly TimeSpan _cacheDuration = TimeSpan.FromMinutes(10);
