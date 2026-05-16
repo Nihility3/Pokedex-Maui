@@ -78,12 +78,9 @@ public static class PokemonService
                     }
                 }
 
-                // type: take first type if present
-                string type = string.Empty;
-                if (root.TryGetProperty("types", out var types) && types.GetArrayLength() > 0)
-                {
-                    type = types[0].GetProperty("type").GetProperty("name").GetString()!;
-                }
+                var pokemonTypes = ParseTypes(root);
+                string type = pokemonTypes.FirstOrDefault() ?? string.Empty;
+                string cryUrl = ParseCryUrl(root);
 
                 // stats: gather raw and normalized
                 int rawHp = 0, rawAtk = 0, rawDef = 0, rawSpAtk = 0, rawSpDef = 0, rawSpeed = 0;
@@ -123,7 +120,9 @@ public static class PokemonService
                     Id = id,
                     Name = Capitalize(name),
                     Type = string.IsNullOrEmpty(type) ? "" : Capitalize(type),
+                    Types = pokemonTypes.Select(Capitalize).ToList(),
                     ImageUrl = imageUrl,
+                    CryUrl = cryUrl,
                     Description = string.Empty,
                     TypeColor = GetColorForType(type),
                     RawHP = rawHp,
@@ -230,11 +229,9 @@ public static class PokemonService
                 }
             }
 
-            string type = string.Empty;
-            if (root.TryGetProperty("types", out var types) && types.GetArrayLength() > 0)
-            {
-                type = types[0].GetProperty("type").GetProperty("name").GetString()!;
-            }
+            var pokemonTypes = ParseTypes(root);
+            string type = pokemonTypes.FirstOrDefault() ?? string.Empty;
+            string cryUrl = ParseCryUrl(root);
 
             var abilities = new List<string>();
             if (root.TryGetProperty("abilities", out var abilitiesElem))
@@ -253,7 +250,9 @@ public static class PokemonService
                 Id = id,
                 Name = Capitalize(root.GetProperty("name").GetString()!),
                 Type = string.IsNullOrEmpty(type) ? "" : Capitalize(type),
+                Types = pokemonTypes.Select(Capitalize).ToList(),
                 ImageUrl = imageUrl,
+                CryUrl = cryUrl,
                 TypeColor = GetColorForType(type),
                 RawHP = rawHp,
                 RawAttack = rawAtk,
@@ -465,6 +464,37 @@ public static class PokemonService
         => $"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/{id}.png";
 
     private static double NormalizeStat(int raw) => Math.Clamp(raw / 255.0, 0.0, 1.0);
+
+    private static List<string> ParseTypes(JsonElement root)
+    {
+        var types = new List<(int Slot, string Name)>();
+        if (root.TryGetProperty("types", out var typeElements))
+        {
+            foreach (var t in typeElements.EnumerateArray())
+            {
+                var slot = t.TryGetProperty("slot", out var slotElement) ? slotElement.GetInt32() : 0;
+                var name = t.GetProperty("type").GetProperty("name").GetString() ?? string.Empty;
+                if (!string.IsNullOrWhiteSpace(name))
+                    types.Add((slot, name));
+            }
+        }
+
+        return types.OrderBy(t => t.Slot).Select(t => t.Name).ToList();
+    }
+
+    private static string ParseCryUrl(JsonElement root)
+    {
+        if (root.TryGetProperty("cries", out var cries))
+        {
+            if (cries.TryGetProperty("latest", out var latest) && latest.ValueKind == JsonValueKind.String)
+                return latest.GetString() ?? string.Empty;
+
+            if (cries.TryGetProperty("legacy", out var legacy) && legacy.ValueKind == JsonValueKind.String)
+                return legacy.GetString() ?? string.Empty;
+        }
+
+        return string.Empty;
+    }
 
     private static Color GetColorForType(string type)
     {

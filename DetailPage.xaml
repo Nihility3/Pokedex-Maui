@@ -25,15 +25,20 @@
                     <Image Source="{Binding ImageUrl}" WidthRequest="140" HeightRequest="140" Aspect="AspectFit" />
 
                     <VerticalStackLayout Grid.Column="1" Padding="10,0" VerticalOptions="Center">
-                        <Button Text="Add to Team" 
-                                Clicked="OnAddToTeamClicked" 
-                                BackgroundColor="Crimson" 
-                                TextColor="White" 
-                                CornerRadius="10" 
-                                HorizontalOptions="Center"
-                                Margin="0,20"/>     
+                        <HorizontalStackLayout Spacing="8" HorizontalOptions="Center" Margin="0,20">
+                            <Button Text="Add to Team"
+                                    Clicked="OnAddToTeamClicked"
+                                    BackgroundColor="Crimson"
+                                    TextColor="White"
+                                    CornerRadius="10" />
+                            <Button Text="Play Cry"
+                                    Clicked="OnPlayCryClicked"
+                                    BackgroundColor="#2E7DCC"
+                                    TextColor="White"
+                                    CornerRadius="10" />
+                        </HorizontalStackLayout>
                         <Label Text="{Binding Name}" FontSize="28" FontAttributes="Bold" TextColor="White" />
-                        <Label Text="{Binding Type}" FontSize="14" TextColor="White" />
+                        <Label Text="{Binding DisplayTypes}" FontSize="14" TextColor="White" />
                         <Label Text="{Binding Description}" FontSize="12" TextColor="White" LineBreakMode="WordWrap" MaxLines="4" />
                     </VerticalStackLayout>
                 </Grid>
@@ -197,6 +202,9 @@
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
                     </CollectionView>
+                    <Button Text="Next Pokemon"
+                            Clicked="OnNextPokemonClicked"
+                            Margin="0,10,0,0" />
                 </VerticalStackLayout>
             </Frame>
         </Grid>

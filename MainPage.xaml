@@ -32,11 +32,21 @@
                     <x:String>Ground</x:String>
                     <x:String>Flying</x:String>
                     <x:String>Bug</x:String>
+                    <x:String>Normal</x:String>
+                    <x:String>Poison</x:String>
+                    <x:String>Fighting</x:String>
+                    <x:String>Ghost</x:String>
+                    <x:String>Steel</x:String>
                     <x:String>Ice</x:String>
                     <x:String>Dragon</x:String>
-                    <x:String>Dark</x:String>   
+                    <x:String>Dark</x:String>
+                    <x:String>Fairy</x:String>
                 </Picker.Items>
             </Picker>
+            <Button x:Name="LoadAllButton"
+                    Text="Load All Pokemon"
+                    Clicked="OnLoadAllClicked"
+                    HorizontalOptions="Fill" />
         </VerticalStackLayout>
 
         <!-- Loading indicator -->
@@ -69,7 +79,7 @@
                                 HeightRequest="56" />
                             <VerticalStackLayout>
                                 <Label Text="{Binding Name}" FontSize="16" />
-                                <Label Text="{Binding Type}" FontSize="12" TextColor="Gray" />
+                                <Label Text="{Binding DisplayTypes}" FontSize="12" TextColor="Gray" />
                                 <HorizontalStackLayout Spacing="6">
                                     <Label Text="HP" FontSize="10" />
                                     <ProgressBar Progress="{Binding HP}" ProgressColor="Green" WidthRequest="100" />

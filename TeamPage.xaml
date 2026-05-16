@@ -22,8 +22,12 @@
                 </BindableLayout.ItemTemplate>
             </FlexLayout>
 
-            <Label Text="Team Defense (Weaknesses)" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center"/>
+            <Label Text="Team Weak To" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center"/>
             <FlexLayout x:Name="DefenseGrid" Wrap="Wrap" JustifyContent="Center">
+            </FlexLayout>
+
+            <Label Text="Team Strong Against" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center"/>
+            <FlexLayout x:Name="StrengthGrid" Wrap="Wrap" JustifyContent="Center">
             </FlexLayout>
 
         </VerticalStackLayout>

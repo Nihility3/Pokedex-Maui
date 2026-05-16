@@ -29,6 +29,9 @@ public partial class DetailPage : ContentPage
             {
                 // copy/update fields onto the bound instance
                 _initial.Description = string.IsNullOrEmpty(detailed.Description) ? _initial.Description : detailed.Description;
+                _initial.Types = detailed.Types;
+                _initial.Type = detailed.Type;
+                _initial.CryUrl = detailed.CryUrl;
                 _initial.EvolutionChain = detailed.EvolutionChain ?? new List<Evolution>();
                 _initial.BaseExperience = detailed.BaseExperience;
                 _initial.GrowthRate = detailed.GrowthRate;
@@ -75,5 +78,37 @@ public partial class DetailPage : ContentPage
         {
             await DisplayAlert("Team Full", "You can only have 6 Pokémon.", "OK");
         }
+    }
+
+    private async void OnNextPokemonClicked(object sender, EventArgs e)
+    {
+        var next = await PokemonService.GetPokemonDetailsAsync(_initial.Id + 1);
+        if (next is null)
+        {
+            await DisplayAlert("Not Found", "There is no next Pokemon available.", "OK");
+            return;
+        }
+
+        await Navigation.PushAsync(new DetailPage(next));
+    }
+
+    private async void OnPlayCryClicked(object sender, EventArgs e)
+    {
+        var pokemon = (Pokemon)BindingContext;
+        var cryUrl = pokemon.CryUrl;
+
+        if (string.IsNullOrWhiteSpace(cryUrl))
+        {
+            var detailed = await PokemonService.GetPokemonDetailsAsync(pokemon.Id);
+            cryUrl = detailed?.CryUrl ?? string.Empty;
+        }
+
+        if (string.IsNullOrWhiteSpace(cryUrl))
+        {
+            await DisplayAlert("No Cry", "No cry audio is available for this Pokemon.", "OK");
+            return;
+        }
+
+        await Launcher.OpenAsync(cryUrl);
     }
 }

@@ -10,6 +10,7 @@ namespace Pokedex1;
 public partial class MainPage : ContentPage
 {
     public ObservableCollection<Pokemon> allPokemon { get; set; } = new ObservableCollection<Pokemon>();
+    public ObservableCollection<Pokemon> VisiblePokemon { get; set; } = new ObservableCollection<Pokemon>();
     private CancellationTokenSource? _cts;
 
     // paging state
@@ -17,17 +18,21 @@ public partial class MainPage : ContentPage
     private const int PageSize = 30;
     private bool _isLoadingMore = false;
     private bool _hasMore = true;
+    private bool _hasLoadedInitialPage = false;
+    private bool _isLoadingAll = false;
 
     public MainPage()
     {
         InitializeComponent();
-        PokeCollection.ItemsSource = allPokemon;
+        PokeCollection.ItemsSource = VisiblePokemon;
+        TypePicker.SelectedIndex = 0;
     }
 
     protected override void OnAppearing()
     {
         base.OnAppearing();
-        _ = LoadInitialAsync();
+        if (!_hasLoadedInitialPage)
+            _ = LoadInitialAsync();
     }
 
     protected override void OnDisappearing()
@@ -41,7 +46,9 @@ public partial class MainPage : ContentPage
         _offset = 0;
         _hasMore = true;
         allPokemon.Clear();
+        VisiblePokemon.Clear();
         await LoadMoreAsync(force: true).ConfigureAwait(false);
+        _hasLoadedInitialPage = true;
     }
 
 
@@ -49,10 +56,10 @@ public partial class MainPage : ContentPage
     // Called by RemainingItemsThresholdReached
     private async void OnRemainingItemsThresholdReached(object sender, EventArgs e)
     {
-        if (_hasMore)
-        {
-            await LoadMoreAsync();
-        }
+            if (_hasMore && !IsFilterActive())
+            {
+                await LoadMoreAsync();
+            }
     }
 
     private async Task LoadMoreAsync(bool force = false)
@@ -88,10 +95,15 @@ public partial class MainPage : ContentPage
                         foreach (var pokemon in page)
                         {
                             allPokemon.Add(pokemon);
+                            if (PokemonMatchesFilter(pokemon))
+                                VisiblePokemon.Add(pokemon);
                         }
                     }
                 });
             }
+
+            if (page.Count < PageSize)
+                _hasMore = false;
         }
         catch (OperationCanceledException)
         {
@@ -117,18 +129,6 @@ public partial class MainPage : ContentPage
 
     private void OnSearchTextChanged(object sender, TextChangedEventArgs e)
     {
-        var searchTerm = e.NewTextValue ?? string.Empty;
-
-        if (string.IsNullOrWhiteSpace(searchTerm))
-        {
-            PokeCollection.ItemsSource = allPokemon;
-        }
-        else
-        {
-            PokeCollection.ItemsSource = allPokemon
-                .Where(p => p.Name?.IndexOf(searchTerm, System.StringComparison.OrdinalIgnoreCase) >= 0)
-                .ToList();
-        }
         ApplyCombinedFilter();
     }
 
@@ -148,47 +148,63 @@ public partial class MainPage : ContentPage
 
         if (selectedIndex == -1) return;
 
-        // Use .Items[selectedIndex] instead of .ItemsSource
-        string selectedType = picker.Items[selectedIndex];
-
-        if (selectedType == "All")
-        {
-            PokeCollection.ItemsSource = allPokemon;
-        }
-        else
-        {
-            var filteredList = allPokemon
-                .Where(p => p.Type == selectedType)
-                .ToList();
-
-            PokeCollection.ItemsSource = filteredList;
-        }
         ApplyCombinedFilter();
     }
     private void ApplyCombinedFilter()
     {
-        // Get the current search text (handle nulls and make it lowercase)
-        string searchText = PokemonSearchBar.Text?.ToLower() ?? "";
+        VisiblePokemon.Clear();
 
-        // Get the current selected type (handle the "All" case)
-        string selectedType = TypePicker.SelectedIndex != -1
-                              ? TypePicker.Items[TypePicker.SelectedIndex]
-                              : "All";
-
-        // Filter the list based on BOTH conditions
-        var filteredList = allPokemon.Where(p =>
+        foreach (var pokemon in allPokemon.Where(PokemonMatchesFilter))
         {
-            bool matchesSearch = string.IsNullOrWhiteSpace(searchText) ||
-                                 p.Name.ToLower().Contains(searchText);
+            VisiblePokemon.Add(pokemon);
+        }
+    }
 
-            bool matchesType = selectedType == "All" ||
-                               p.Type == selectedType;
+    private bool PokemonMatchesFilter(Pokemon pokemon)
+    {
+        string searchText = PokemonSearchBar?.Text?.Trim() ?? string.Empty;
+        string selectedType = TypePicker?.SelectedIndex >= 0
+            ? TypePicker.Items[TypePicker.SelectedIndex]
+            : "All";
 
-            return matchesSearch && matchesType;
-        }).ToList();
+        bool matchesSearch = string.IsNullOrWhiteSpace(searchText) ||
+                             pokemon.Name.Contains(searchText, System.StringComparison.OrdinalIgnoreCase);
 
-        // Update the UI
-        PokeCollection.ItemsSource = filteredList;
+        bool matchesType = selectedType == "All" ||
+                           pokemon.Types.Any(t => t.Equals(selectedType, System.StringComparison.OrdinalIgnoreCase)) ||
+                           pokemon.Type.Equals(selectedType, System.StringComparison.OrdinalIgnoreCase);
+
+        return matchesSearch && matchesType;
+    }
+
+    private bool IsFilterActive()
+    {
+        var selectedType = TypePicker?.SelectedIndex >= 0 ? TypePicker.Items[TypePicker.SelectedIndex] : "All";
+        return !string.IsNullOrWhiteSpace(PokemonSearchBar?.Text) || selectedType != "All";
+    }
+
+    private async void OnLoadAllClicked(object sender, EventArgs e)
+    {
+        if (_isLoadingAll)
+            return;
+
+        _isLoadingAll = true;
+        LoadAllButton.IsEnabled = false;
+        LoadAllButton.Text = "Loading...";
+
+        try
+        {
+            while (_hasMore)
+            {
+                await LoadMoreAsync();
+                await Task.Delay(75);
+            }
+        }
+        finally
+        {
+            _isLoadingAll = false;
+            LoadAllButton.Text = "All Pokemon Loaded";
+        }
     }
     private async void OnViewTeamClicked(object sender, EventArgs e)
     {

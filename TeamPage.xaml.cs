@@ -21,30 +21,52 @@ public partial class TeamPage : ContentPage
     private void CalculateMetrics()
     {
         DefenseGrid.Children.Clear();
-        var allTypes = new List<string> { "Fire", "Water", "Grass", "Electric", "Ice", "Ground" }; // Add more
+        StrengthGrid.Children.Clear();
+        var allTypes = TypeChart.Types;
 
         foreach (var type in allTypes)
         {
-            // Count how many team members are weak to this specific type
-            int weaknessCount = CurrentTeam.Count(p => p.Weaknesses.Contains(type));
+            int weaknessCount = CurrentTeam.Count(p => TypeChart.GetDefenseMultiplier(type, p.Types.Count > 0 ? p.Types : new List<string> { p.Type }) > 1);
+            if (weaknessCount > 0)
+                DefenseGrid.Children.Add(CreateBadge($"{type}: {weaknessCount}", GetTypeColor(type)));
 
-            var badge = new Frame
-            {
-                BackgroundColor = GetTypeColor(type),
-                Content = new Label { Text = $"{type}: {weaknessCount}", TextColor = Colors.White }
-            };  
-            DefenseGrid.Children.Add(badge);
+            int strongCount = CurrentTeam.Count(p => (p.Types.Count > 0 ? p.Types : new List<string> { p.Type }).Any(teamType => TypeChart.GetAttackMultiplier(teamType, type) > 1));
+            if (strongCount > 0)
+                StrengthGrid.Children.Add(CreateBadge($"{type}: {strongCount}", GetTypeColor(type)));
         }
     }
 
     private Color GetTypeColor(string type) => type switch
     {
+        "Normal" => Colors.Gray,
         "Fire" => Colors.Red,
         "Water" => Colors.Blue,
         "Grass" => Colors.Green,
+        "Electric" => Colors.Gold,
+        "Ice" => Colors.LightBlue,
+        "Fighting" => Colors.DarkRed,
+        "Poison" => Colors.Purple,
+        "Ground" => Colors.SaddleBrown,
+        "Flying" => Colors.SkyBlue,
+        "Psychic" => Colors.DeepPink,
+        "Bug" => Colors.OliveDrab,
+        "Rock" => Colors.Sienna,
+        "Ghost" => Colors.Indigo,
+        "Dragon" => Colors.MediumPurple,
+        "Dark" => Colors.Black,
+        "Steel" => Colors.SlateGray,
+        "Fairy" => Colors.HotPink,
         _ => Colors.Gray
     };
-    // Inside your TeamPage.xaml.cs
+
+    private static Border CreateBadge(string text, Color color) => new()
+    {
+        BackgroundColor = color,
+        Padding = 8,
+        Margin = 4,
+        Content = new Label { Text = text, TextColor = Colors.White }
+    };
+
     private void OnRemoveClicked(object sender, EventArgs e)
     {
         var button = (Button)sender;
