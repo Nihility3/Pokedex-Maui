@@ -8,10 +8,10 @@
         <VerticalStackLayout Padding="10" Spacing="20" BackgroundColor="#2C2C2C">
 
             <FlexLayout BindableLayout.ItemsSource="{Binding CurrentTeam}" 
-                        Wrap="Wrap" JustifyContent="SpaceEvenly">
+                        Wrap="Wrap" JustifyContent="Center">
                 <BindableLayout.ItemTemplate>
                     <DataTemplate>
-                        <Frame WidthRequest="150" HeightRequest="120" Margin="5" BackgroundColor="#3D3D3D">
+                        <Frame WidthRequest="150" HeightRequest="180" Margin="5" BackgroundColor="#3D3D3D">
                             <VerticalStackLayout HorizontalOptions="Center">
                                 <Image Source="{Binding ImageUrl}" HeightRequest="60"/>
                                 <Label Text="{Binding Name}" TextColor="White" HorizontalOptions="Center"/>

@@ -1,4 +1,5 @@
-﻿using Pokedex1.Models;
+﻿using CommunityToolkit.Maui.Views;
+using Pokedex1.Models;
 using Pokedex1.Services;
 
 namespace Pokedex1;
@@ -92,8 +93,10 @@ public partial class DetailPage : ContentPage
         await Navigation.PushAsync(new DetailPage(next));
     }
 
-    private async void OnPlayCryClicked(object sender, EventArgs e)
+    protected override async void OnAppearing()
     {
+        base.OnAppearing();
+
         var pokemon = (Pokemon)BindingContext;
         var cryUrl = pokemon.CryUrl;
 
@@ -103,12 +106,28 @@ public partial class DetailPage : ContentPage
             cryUrl = detailed?.CryUrl ?? string.Empty;
         }
 
-        if (string.IsNullOrWhiteSpace(cryUrl))
+        if (!string.IsNullOrWhiteSpace(cryUrl))
         {
-            await DisplayAlert("No Cry", "No cry audio is available for this Pokemon.", "OK");
-            return;
-        }
+            Console.WriteLine($"[CryAudio] Converting OGG to WAV for: {cryUrl}");
+            var wavStream = await OggConverter.FetchOggAsWavAsync(cryUrl);
 
-        await Launcher.OpenAsync(cryUrl);
+            var tempPath = Path.Combine(FileSystem.CacheDirectory, "cry_temp.wav");
+            using (var fileStream = File.Create(tempPath))
+            {
+                await wavStream.CopyToAsync(fileStream);
+            }
+
+            Console.WriteLine($"[CryAudio] WAV written to: {tempPath}");
+            CryMediaElement.Source = MediaSource.FromFile(tempPath);
+            Console.WriteLine($"[CryAudio] Source set from temp file");
+        }
+    }
+
+    private void OnPlayCryClicked(object sender, EventArgs e)
+    {
+        Console.WriteLine($"[CryAudio] Play button clicked, CurrentState: {CryMediaElement.CurrentState}");
+        CryMediaElement.Stop();
+        CryMediaElement.Play();
+        Console.WriteLine($"[CryAudio] Play() called, CurrentState: {CryMediaElement.CurrentState}");
     }
 }
